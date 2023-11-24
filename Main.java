@@ -7,20 +7,28 @@ import java.util.Scanner;
 
 class Main{
 
-    class Nodo{
+    static class Nodo{
+
         public String programa;
         public boolean ocupado;
         public int tamanho;
+
         public Nodo(String programa, boolean ocupado, int tamanho){
             this.programa = programa;
             this.ocupado = ocupado;
             this.tamanho = tamanho;
         }
+        
+        public String toString(){
+            return "|"+tamanho+"|";
+        }
     }
-
-    public static LinkedList<Nodo> memoria = new LinkedList<Nodo>();
+    
+    public static int memoriaSize = 32;
+    public static LinkedList<Nodo> memorias = new LinkedList<Nodo>();
 
     public static void main(String[] args){
+        // criaMemoria(tamanhoMemoria, tamanhoPaginaEMoldura);
         HashMap<Integer, String> instrucoes = new HashMap<Integer, String>(); //codigo do programa
         Scanner sc = new Scanner(System.in);
 
@@ -48,11 +56,13 @@ class Main{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
+        System.out.println("Qual política de alocação deseja?\n1 - Best-Fit\n2 - Worst-Fit\n3 - Fisrt-Fit\n4 - Circular-Fit");
+        int tipo = sc.nextInt();
+        // cria primeiro nodo com memoria total
+        memorias.addFirst(new Nodo("M", false, memoriaSize));
         //EXECUCAO DE CADA INSTRUCAO NO HASHMAP
         for(int i = 0; i < instrucoes.size(); i++){
-            System.out.println("Qual política de alocação deseja?\n1 - Best-Fit\n2 - Worst-Fit\n3 - Fisrt-Fit\n4 - Circular-Fit");
-            int tipo = sc.nextInt();
             executaAcao(instrucoes.get(i), tipo);
         }
 
@@ -61,13 +71,36 @@ class Main{
 
     public static void executaAcao(String instrucao, int tipo) {
 
-        String[] acao = instrucao.split("(");
-
+        String[] acao = instrucao.split("\\(");
+        String stringMemorias = "";
+        int melhorTamanhoNodo = 0;
+        boolean semMemoria = false;
         switch (acao[0]) {
             case "in":
+                String[] processoIn = acao[1].replace(")","").split(", ");
                 switch (tipo){
+                    //best-fit
                     case 1:
-                        break; //ADICIONAR ALOCACAO Best-Fit
+                        int distanciaTamanhoProcessoTamanhoMemoria = 1000;
+                        Nodo memoriaEscolhida = null;
+                        semMemoria = true;
+                        int tamanhoProcesso = Integer.parseInt(processoIn[1]);
+                        for(Nodo memoria : memorias){
+                            //caso não ocupado, tamanho da memoria maior do que o do processo e seja o menor numero, seta como novo candidato a guardar memoria
+                            if(!memoria.ocupado && memoria.tamanho > tamanhoProcesso && memoria.tamanho - tamanhoProcesso < distanciaTamanhoProcessoTamanhoMemoria){
+                                semMemoria = false;
+                                melhorTamanhoNodo = memoria.tamanho;
+                                distanciaTamanhoProcessoTamanhoMemoria = memoria.tamanho - tamanhoProcesso;
+                                memoriaEscolhida = memoria;
+                            }
+                        }
+                        //adiciona nodo antes da memoriaEscolhida, diminui tamanho do nodo escolhido e transforma nodos desocupados adjacentes em um so
+                        if(!semMemoria){
+                            memoriaEscolhida.tamanho = distanciaTamanhoProcessoTamanhoMemoria;
+                            memorias.add(memorias.indexOf(memoriaEscolhida),new Nodo(processoIn[0],true,tamanhoProcesso));
+                            concatenaEspacos();
+                        }
+                        break;
                     case 2:
                         break; //ADICIONAR ALOCACAO Worst-Fit
                     case 3:
@@ -75,19 +108,50 @@ class Main{
                     case 4:
                         break; //ADICIONAR ALOCACAO Circular-Fit
                 }
-            case "out":
                 break;
+            case "out":
+                String processoOut = acao[1].replace(")","");
+                switch (tipo) {
+                    case 1:
+                        for(Nodo memoria : memorias){
+                            //retira processo e seta como desocupado o nodo para poder se juntar a memoria desocupada
+                            if(memoria.programa.equals(processoOut)){
+                                memoria.programa = "M";
+                                memoria.ocupado = false;
+                            }
+                        }
+                        concatenaEspacos();
+                        break;
+                    case 2:
+                        break; //ADICIONAR ALOCACAO Worst-Fit
+                    case 3:
+                        break; //ADICIONAR ALOCACAO First-Fit
+                    case 4:
+                        break; //ADICIONAR ALOCACAO Circular-Fit
+                };
+                break;
+        }
+
+        for(Nodo memoria : memorias){
+            if(!memoria.ocupado)
+                stringMemorias+=memoria.toString()+ " ";
+        }
+        // lista de nodos desocupados conforme mostrado nos exemplos do sor do T2
+        System.out.println(stringMemorias);
+        
+        if(semMemoria){
+            System.out.println("ESPAÇO INSUFICIENTE DE MEMÓRIA");
         }
     }
 
     public static void concatenaEspacos(){
-        for (int i = 0; i < memoria.size() - 1; i++) {
-            Nodo aux1 = memoria.get(i);
-            Nodo aux2 = memoria.get(i+1);
+        for (int i = 0; i < memorias.size() - 1; i++) {
+            Nodo aux1 = memorias.get(i);
+            Nodo aux2 = memorias.get(i+1);
 
             if(!(aux1.ocupado) && !(aux2.ocupado)){
                 aux1.tamanho += aux2.tamanho;
-                memoria.remove(i+1);
+                memorias.remove(i+1);
             }
         }
     }
