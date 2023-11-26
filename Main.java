@@ -87,7 +87,8 @@ class Main{
                         int tamanhoProcesso = Integer.parseInt(processoIn[1]);
                         for(Nodo memoria : memorias){
                             //caso não ocupado, tamanho da memoria maior do que o do processo e seja o menor numero, seta como novo candidato a guardar memoria
-                            if(!memoria.ocupado && memoria.tamanho > tamanhoProcesso && memoria.tamanho - tamanhoProcesso < distanciaTamanhoProcessoTamanhoMemoria){
+                            if(!memoria.ocupado && memoria.tamanho > tamanhoProcesso && memoria.tamanho - tamanhoProcesso < distanciaTamanhoProcessoTamanhoMemoria){ 
+                                                   //n deveria ser >=?
                                 semMemoria = false;
                                 melhorTamanhoNodo = memoria.tamanho;
                                 distanciaTamanhoProcessoTamanhoMemoria = memoria.tamanho - tamanhoProcesso;
@@ -104,6 +105,24 @@ class Main{
                     case 2:
                         break; //ADICIONAR ALOCACAO Worst-Fit
                     case 3:
+                    //alteracao
+                         Nodo memoriaEscolhidaFf = null;
+                        semMemoria = true;
+                        int tamanhoProcessoFf = Integer.parseInt(processoIn[1]);
+                        int distanciaTamanhoProcessoTamanhoMemoriaFf = 0;
+                        for(Nodo memoria :memorias){
+                            if(!memoria.ocupado && memoria.tamanho >= tamanhoProcessoFf){
+                                semMemoria = false;
+                                melhorTamanhoNodo = memoria.tamanho;
+                                distanciaTamanhoProcessoTamanhoMemoriaFf = memoria.tamanho - tamanhoProcessoFf;
+                                memoriaEscolhidaFf = memoria;
+                            }
+                        }
+                        if(!semMemoria){
+                            memoriaEscolhidaFf.tamanho = distanciaTamanhoProcessoTamanhoMemoriaFf;
+                            memorias.add(memorias.indexOf(memoriaEscolhidaFf),new Nodo(processoIn[0],true,tamanhoProcessoFf));
+                            concatenaEspacos();
+                        }
                         break; //ADICIONAR ALOCACAO First-Fit
                     case 4:
                         break; //ADICIONAR ALOCACAO Circular-Fit
@@ -125,6 +144,15 @@ class Main{
                     case 2:
                         break; //ADICIONAR ALOCACAO Worst-Fit
                     case 3:
+                    //alteracao
+                    for(Nodo memoria : memorias){
+                            //retira processo e seta como desocupado o nodo para poder se juntar a memoria desocupada
+                            if(memoria.programa.equals(processoOut)){
+                                memoria.programa = "M";
+                                memoria.ocupado = false;
+                            }
+                        }
+                     concatenaEspacos();
                         break; //ADICIONAR ALOCACAO First-Fit
                     case 4:
                         break; //ADICIONAR ALOCACAO Circular-Fit
@@ -145,7 +173,8 @@ class Main{
     }
 
     public static void concatenaEspacos(){
-        for (int i = 0; i < memorias.size() - 1; i++) {
+        for (int i = memorias.size() - 2; i >= 0; i--) {
+        //for (int i = 0; i < memorias.size() - 1; i++) { alteracao
             Nodo aux1 = memorias.get(i);
             Nodo aux2 = memorias.get(i+1);
 
