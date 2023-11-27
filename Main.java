@@ -59,11 +59,10 @@ class Main {
         int memoriaSize = 0;
         boolean ehlog2 = false;
         while (!ehlog2) {
-            System.out.println("Qual tamanho total da memoria que deseja alocar?(memoria = 2ˆn)");
+            System.out.println("Qual tamanho total da memoria que deseja alocar em KB?(memoria = 2ˆn)");
             memoriaSize = sc.nextInt();
             double log = Math.log(memoriaSize) / Math.log(2);
             if (log % 1 == 0) {
-                System.out.println("memoria" + memoriaSize);
                 ehlog2 = true;
             } else {
                 System.out.println("Quantidade de memoria nao permitida, digite um numero 2^n");
