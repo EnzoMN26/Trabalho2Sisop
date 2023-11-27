@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.lang.Math;
 
 class Main {
 
@@ -24,7 +25,6 @@ class Main {
         }
     }
 
-    public static int memoriaSize = 64;
     public static LinkedList<Nodo> memorias = new LinkedList<Nodo>();
 
     public static void main(String[] args) {
@@ -56,7 +56,19 @@ class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        int memoriaSize = 0;
+        boolean ehlog2 = false;
+        while (!ehlog2) {
+            System.out.println("Qual tamanho total da memoria que deseja alocar?(memoria = 2ˆn)");
+            memoriaSize = sc.nextInt();
+            double log = Math.log(memoriaSize) / Math.log(2);
+            if (log % 1 == 0) {
+                System.out.println("memoria" + memoriaSize);
+                ehlog2 = true;
+            } else {
+                System.out.println("Quantidade de memoria nao permitida, digite um numero 2^n");
+            }
+        }
         System.out.println(
                 "Qual política de alocação deseja?\n1 - Best-Fit\n2 - Worst-Fit\n3 - First-Fit\n4 - Circular-Fit");
         int tipo = sc.nextInt();
