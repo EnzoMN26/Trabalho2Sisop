@@ -59,7 +59,7 @@ class Main {
         int memoriaSize = 0;
         boolean ehlog2 = false;
         while (!ehlog2) {
-            System.out.println("Qual tamanho total da memoria que deseja alocar em KB?(memoria = 2ˆn)");
+            System.out.println("Qual tamanho total da memoria que deseja alocar em KB?(memoria = 2^n)");
             memoriaSize = sc.nextInt();
             double log = Math.log(memoriaSize) / Math.log(2);
             if (log % 1 == 0) {
@@ -107,7 +107,6 @@ class Main {
                             // menor numero, seta como novo candidato a guardar memoria
                             if (!memoria.ocupado && memoria.tamanho >= tamanhoProcessoBf
                                     && memoria.tamanho - tamanhoProcessoBf < distanciaTamanhoProcessoTamanhoMemoriaBf) {
-                                // n deveria ser >=?
                                 semMemoria = false;
                                 distanciaTamanhoProcessoTamanhoMemoriaBf = memoria.tamanho - tamanhoProcessoBf;
                                 memoriaEscolhidaBf = memoria;
@@ -116,14 +115,20 @@ class Main {
                         // adiciona nodo antes da memoriaEscolhida, diminui tamanho do nodo escolhido e
                         // transforma nodos desocupados adjacentes em um so
                         if (!semMemoria) {
-                            memoriaEscolhidaBf.tamanho = distanciaTamanhoProcessoTamanhoMemoriaBf;
-                            memorias.add(memorias.indexOf(memoriaEscolhidaBf),
-                                    new Nodo(processoIn[0], true, tamanhoProcessoBf));
+                            if(distanciaTamanhoProcessoTamanhoMemoriaBf == 0){
+                                memoriaEscolhidaBf.programa = processoIn[0];
+                                memoriaEscolhidaBf.ocupado = true;
+                                memoriaEscolhidaBf.tamanho = tamanhoProcessoBf;
+                            }
+                            else{
+                                memoriaEscolhidaBf.tamanho = distanciaTamanhoProcessoTamanhoMemoriaBf;
+                                memorias.add(memorias.indexOf(memoriaEscolhidaBf),
+                                        new Nodo(processoIn[0], true, tamanhoProcessoBf));
+                            }
                             concatenaEspacos();
                         }
                         break;
-                    case 2:
-                        // alteracao
+                    case 2: // Worst-Fit
                         Nodo memoriaEscolhidaWf = null;
                         semMemoria = true;
                         int tamanhoProcessoWf = Integer.parseInt(processoIn[1]);
@@ -137,14 +142,20 @@ class Main {
                             }
                         }
                         if (!semMemoria) {
-                            memoriaEscolhidaWf.tamanho = distanciaTamanhoProcessoTamanhoMemoriaWf;
-                            memorias.add(memorias.indexOf(memoriaEscolhidaWf),
-                                    new Nodo(processoIn[0], true, tamanhoProcessoWf));
+                            if(distanciaTamanhoProcessoTamanhoMemoriaWf == 0){
+                                memoriaEscolhidaWf.programa = processoIn[0];
+                                memoriaEscolhidaWf.ocupado = true;
+                                memoriaEscolhidaWf.tamanho = tamanhoProcessoWf;
+                            }
+                            else{
+                                memoriaEscolhidaWf.tamanho = distanciaTamanhoProcessoTamanhoMemoriaWf;
+                                memorias.add(memorias.indexOf(memoriaEscolhidaWf),
+                                        new Nodo(processoIn[0], true, tamanhoProcessoWf));
+                            }
                             concatenaEspacos();
                         }
-                        break; // ADICIONAR ALOCACAO Worst-Fit
-                    case 3:
-                        // alteracao
+                        break;
+                    case 3: // First-Fit
                         Nodo memoriaEscolhidaFf = null;
                         semMemoria = true;
                         boolean achouFirstFf = false;
@@ -159,13 +170,20 @@ class Main {
                             }
                         }
                         if (!semMemoria) {
-                            memoriaEscolhidaFf.tamanho = distanciaTamanhoProcessoTamanhoMemoriaFf;
-                            memorias.add(memorias.indexOf(memoriaEscolhidaFf),
-                                    new Nodo(processoIn[0], true, tamanhoProcessoFf));
+                            if(distanciaTamanhoProcessoTamanhoMemoriaFf == 0){
+                                memoriaEscolhidaFf.programa = processoIn[0];
+                                memoriaEscolhidaFf.ocupado = true;
+                                memoriaEscolhidaFf.tamanho = tamanhoProcessoFf;
+                            }
+                            else{
+                                memoriaEscolhidaFf.tamanho = distanciaTamanhoProcessoTamanhoMemoriaFf;
+                                memorias.add(memorias.indexOf(memoriaEscolhidaFf),
+                                        new Nodo(processoIn[0], true, tamanhoProcessoFf));
+                            }
                             concatenaEspacos();
                         }
-                        break; // ADICIONAR ALOCACAO First-Fit
-                    case 4:
+                        break;
+                    case 4: //Circular-Fit
                         Nodo memoriaEscolhidaCf = null;
                         semMemoria = true;
                         boolean achouFirstCf = false;
@@ -189,14 +207,31 @@ class Main {
                                 memoriaEscolhidaCf = memorias.get(i);
                             }
                         }
+                        if(semMemoria){
+                            if(!(memorias.getFirst().ocupado) && !(memorias.getLast().ocupado) && memorias.getFirst().tamanho + memorias.getLast().tamanho > tamanhoProcessoCf){
+                                memorias.getFirst().tamanho += memorias.getLast().tamanho;
+                                memorias.removeLast();
+                                semMemoria = false;
+                                achouFirstCf = true;
+                                distanciaTamanhoProcessoTamanhoMemoriaCf = memorias.getFirst().tamanho - tamanhoProcessoCf;
+                                memoriaEscolhidaCf = memorias.getFirst();
+                            }
+                        }
                         if (!semMemoria) {
+                            if(distanciaTamanhoProcessoTamanhoMemoriaCf == 0){
+                                memoriaEscolhidaCf.programa = processoIn[0];
+                                memoriaEscolhidaCf.ocupado = true;
+                                memoriaEscolhidaCf.tamanho = tamanhoProcessoCf;
+                            }
+                            else{
                             memoriaEscolhidaCf.tamanho = distanciaTamanhoProcessoTamanhoMemoriaCf;
                             memorias.add(memorias.indexOf(memoriaEscolhidaCf),
                                     new Nodo(processoIn[0], true, tamanhoProcessoCf));
+                            }
                             indexTipo4 = memorias.lastIndexOf(memoriaEscolhidaCf);
                             concatenaEspacos();
                         }
-                        break; // ADICIONAR ALOCACAO Circular-Fit
+                        break; 
                 }
                 break;
             case "out":
@@ -217,11 +252,13 @@ class Main {
             if (!memoria.ocupado)
                 stringMemorias += memoria.toString() + " ";
         }
-        // lista de nodos desocupados conforme mostrado nos exemplos do sor do T2
-        System.out.println(stringMemorias);
 
         if (semMemoria) {
             System.out.println("ESPAÇO INSUFICIENTE DE MEMÓRIA");
+        }
+        else{
+            // lista de nodos desocupados conforme mostrado nos exemplos do sor do T2
+            System.out.println(stringMemorias);
         }
         return indexTipo4 + 1;
     }
