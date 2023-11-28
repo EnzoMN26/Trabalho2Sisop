@@ -197,7 +197,19 @@ class Main {
                                 distanciaTamanhoProcessoTamanhoMemoriaCf = memorias.get(i).tamanho - tamanhoProcessoCf;
                                 memoriaEscolhidaCf = memorias.get(i);
                             }
+
+                            if(memorias.get(i).equals(memorias.getLast()) && semMemoria){
+                                if(!(memorias.getFirst().ocupado) && !(memorias.getLast().ocupado) && memorias.getFirst().tamanho + memorias.getLast().tamanho > tamanhoProcessoCf){
+                                    memorias.getFirst().tamanho += memorias.getLast().tamanho;
+                                    memorias.removeLast();
+                                    semMemoria = false;
+                                    achouFirstCf = true;
+                                    distanciaTamanhoProcessoTamanhoMemoriaCf = memorias.getFirst().tamanho - tamanhoProcessoCf;
+                                    memoriaEscolhidaCf = memorias.getFirst();
+                                }
+                            }
                         }
+                        
                         for (int i = 0; i < indexUltimoAlocado; i++) {
                             if (!memorias.get(i).ocupado && memorias.get(i).tamanho >= tamanhoProcessoCf
                                     && !achouFirstCf) {
@@ -205,16 +217,6 @@ class Main {
                                 achouFirstCf = true;
                                 distanciaTamanhoProcessoTamanhoMemoriaCf = memorias.get(i).tamanho - tamanhoProcessoCf;
                                 memoriaEscolhidaCf = memorias.get(i);
-                            }
-                        }
-                        if(semMemoria){
-                            if(!(memorias.getFirst().ocupado) && !(memorias.getLast().ocupado) && memorias.getFirst().tamanho + memorias.getLast().tamanho > tamanhoProcessoCf){
-                                memorias.getFirst().tamanho += memorias.getLast().tamanho;
-                                memorias.removeLast();
-                                semMemoria = false;
-                                achouFirstCf = true;
-                                distanciaTamanhoProcessoTamanhoMemoriaCf = memorias.getFirst().tamanho - tamanhoProcessoCf;
-                                memoriaEscolhidaCf = memorias.getFirst();
                             }
                         }
                         if (!semMemoria) {
